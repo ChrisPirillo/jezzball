@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- =================================================================
+    |   TECHNICAL & SEO OPTIMIZATIONS (APPLIED @ 2025-07-17)
+    |   - Engineer: Gemini, based on specs from Chris Pirillo
+    |   - Goal: Enhance SEO, Performance, and Core Web Vitals.
+    |   - Note: JavaScript game logic remains UNCHANGED as per requirements.
+    ================================================================== -->
+
+    <!-- // 1. CORE METADATA & CHARSET // -->
+    <meta charset="UTF-8">
+    <title>JezzBall - Classic Arcade Game Recreation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Play a pixel-perfect recreation of the classic 90s Windows game, JezzBall. Build walls to capture the area while avoiding the bouncing balls. A true retro arcade experience!">
+    <meta name="keywords" content="JezzBall, retro game, classic arcade, windows game, 90s game, web game, html5 game, arcade">
+    <meta name="author" content="Chris Pirillo">
+
+    <!-- // 2. CANONICAL & ROBOTS // -->
+    <link rel="canonical" href="https://pirillo.com/arcade/jezzball.html">
+
+    <!-- // 3. GOOGLE ANALYTICS (as requested) // -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-1CQ4D3VQ3L"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-1CQ4D3VQ3L');
+    </script>
+
+    <!-- // 4. PERFORMANCE: RESOURCE HINTS & FONT OPTIMIZATION // -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=VT323&display=swap" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=VT323&display=swap"></noscript>
+    
+    <!-- // 5. SOCIAL & OPEN GRAPH METADATA // -->
+    <meta property="og:title" content="JezzBall - Classic Arcade Game Recreation">
+    <meta property="og:description" content="Play a pixel-perfect recreation of the classic 90s Windows game, JezzBall.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://pirillo.com/arcade/jezzball.html">
+    <meta property="og:image" content="https://pirillo.com/arcade/images/jezzball.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:site_name" content="Chris Pirillo's Arcade">
+
+    <!-- // 6. TWITTER CARD METADATA // -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@ChrisPirillo">
+    <meta name="twitter:creator" content="@ChrisPirillo">
+    <meta name="twitter:title" content="JezzBall - Classic Arcade Game Recreation">
+    <meta name="twitter:description" content="Play a pixel-perfect recreation of the classic 90s Windows game, JezzBall.">
+    <meta name="twitter:image" content="https://pirillo.com/arcade/images/jezzball.png">
+    
+    <!-- // 7. STRUCTURED DATA (JSON-LD) // -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "VideoGame",
+      "name": "JezzBall",
+      "url": "https://pirillo.com/arcade/jezzball.html",
+      "author": {
+        "@type": "Person",
+        "name": "Chris Pirillo"
+      },
+      "description": "A faithful HTML5 recreation of the classic 1992 Microsoft Windows game, JezzBall. The objective is to capture at least 75% of the play area by building walls without getting hit by the bouncing balls.",
+      "gamePlatform": "Web Browser",
+      "applicationCategory": "Game",
+      "operatingSystem": "Any with a modern web browser",
+      "inLanguage": "en-US",
+      "playMode": "SinglePlayer",
+      "keywords": "JezzBall, retro game, classic arcade, windows game, 90s game, web game",
+      "image": "https://pirillo.com/arcade/images/jezzball.png",
+      "publisher": {
+        "@type": "Person",
+        "name": "Chris Pirillo"
+      }
+    }
+    </script>
+
+    <style>
+        /* CSS is inlined for performance, minimizing render-blocking requests. */
+        /* NOTE: The original @import for Google Fonts was replaced with optimized <link> tags in the <head>. */
+        body {
+            font-family: 'VT323', monospace;
+            background-color: #008080; /* Classic Windows Teal */
+            color: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            -webkit-user-select: none; /* Safari */
+            -ms-user-select: none; /* IE 10+ */
+            user-select: none;
+        }
+
+        .game-container {
+            border: 2px solid;
+            border-color: #fff #808080 #808080 #fff; /* Bevel high */
+            background-color: #c0c0c0;
+            padding: 10px;
+            box-shadow: 5px 5px 10px rgba(0,0,0,0.5);
+        }
+
+        .header {
+            position: relative; /* For positioning the sound icon */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #000080; /* Classic Windows title bar blue */
+            color: #fff;
+            padding: 4px 8px;
+            font-size: 20px;
+            margin-bottom: 10px;
+            border: 2px solid;
+            border-color: #fff #808080 #808080 #fff;
+        }
+        
+        /* CSS FIX: Remove default margin from h1 to prevent stretching the header */
+        .header h1 {
+            margin: 0;
+            font-size: inherit;
+            font-weight: normal;
+        }
+
+        #sound-toggle {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            width: 24px;
+            height: 24px;
+        }
+
+        #sound-toggle svg {
+            width: 100%;
+            height: 100%;
+            fill: #c0c0c0; /* Light gray for icon */
+            transition: fill 0.2s;
+        }
+
+        #sound-toggle:hover svg {
+            fill: #fff; /* White on hover */
+        }
+
+        .info-bar {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding: 5px;
+            border: 2px solid;
+            border-color: #808080 #fff #fff #808080; /* Bevel low */
+            font-size: 22px;
+        }
+
+        #gameCanvas {
+            background-color: #000;
+            border: 2px solid;
+            border-color: #808080 #fff #fff #808080; /* Bevel low */
+            cursor: crosshair;
+            display: block;
+            /* Explicit width/height on canvas element prevents CLS */
+        }
+        
+        #messageOverlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 48px;
+            text-align: center;
+            pointer-events: none; /* Allows clicks to pass through */
+            text-shadow: 3px 3px 5px black;
+        }
+    </style>
+</head>
+<body>
+
+<main>
+    <div class="game-container">
+        <header class="header">
+            <h1>JezzBall Classic</h1>
+            <div id="sound-toggle" role="button" aria-label="Toggle Sound">
+                <!-- SVG will be injected by JS -->
+            </div>
+        </header>
+        <div class="info-bar" role="status" aria-live="polite">
+            <div id="level-display">Level: 1</div>
+            <div id="lives-display">Lives: 10</div>
+            <div id="capture-display">Captured: 0%</div>
+        </div>
+        <section aria-label="JezzBall Game Area">
+            <div style="position: relative;">
+                <canvas id="gameCanvas" width="640" height="480"></canvas>
+                <div id="messageOverlay"></div>
+            </div>
+        </section>
+    </div>
+</main>
+
+<!-- =================================================================
+|   GAME SCRIPT
+|   - NOTE: This script is intentionally placed at the end of the body
+|     to avoid render-blocking. It is NOT deferred or async as it's
+|     inline and depends on the DOM elements above.
+|   - The LOGIC of this script has NOT been modified.
+================================================================== -->
+<script>
+// --- DOM ELEMENTS ---
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+const levelDisplay = document.getElementById('level-display');
+const livesDisplay = document.getElementById('lives-display');
+const captureDisplay = document.getElementById('capture-display');
+const soundToggle = document.getElementById('sound-toggle');
+const messageOverlay = document.getElementById('messageOverlay');
+
+// --- SVG ICONS ---
+const SVG_SOUND_ON = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>`;
+const SVG_SOUND_OFF = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg>`;
+
+
+// --- GAME CONFIGURATION ---
+const GAME_WIDTH = canvas.width;
+const GAME_HEIGHT = canvas.height;
+const BALL_RADIUS = 8;
+const WALL_BUILD_SPEED = 4;
+const CAPTURE_GOAL = 75;
+const INITIAL_LIVES = 10;
+
+// --- GAME STATE ---
+let level = 1;
+let lives = INITIAL_LIVES;
+let balls = [];
+let activeAreas = [];
+let buildingWall = null;
+let totalArea = GAME_WIDTH * GAME_HEIGHT;
+let capturedArea = 0;
+let gameState = 'IDLE'; // IDLE, PLAYING, LEVEL_COMPLETE, GAME_OVER
+let soundEnabled = true;
+
+// --- AUDIO CONTEXT for Sound Effects ---
+let audioCtx;
+function initAudio() {
+    if (!audioCtx) {
+        try {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        } catch (e) {
+            console.error("Web Audio API is not supported in this browser");
+            soundEnabled = false;
+            updateSoundIcon();
+        }
+    }
+}
+
+function playSound(type) {
+    if (!soundEnabled || !audioCtx) return;
+
+    const oscillator = audioCtx.createOscillator();
+    const gainNode = audioCtx.createGain();
+    oscillator.connect(gainNode);
+    gainNode.connect(audioCtx.destination);
+    gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+
+    switch (type) {
+        case 'startWall':
+            oscillator.type = 'sine';
+            oscillator.frequency.setValueAtTime(880, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + 0.2);
+            break;
+        case 'completeWall':
+            oscillator.type = 'square';
+            oscillator.frequency.setValueAtTime(220, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + 0.3);
+            break;
+        case 'failWall':
+            oscillator.type = 'sawtooth';
+            oscillator.frequency.setValueAtTime(110, audioCtx.currentTime);
+            oscillator.frequency.exponentialRampToValueAtTime(55, audioCtx.currentTime + 0.3);
+            gainNode.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + 0.3);
+            break;
+        case 'levelComplete':
+             oscillator.type = 'triangle';
+             let now = audioCtx.currentTime;
+             oscillator.frequency.setValueAtTime(523.25, now);
+             now += 0.1;
+             oscillator.frequency.setValueAtTime(659.25, now);
+             now += 0.1;
+             oscillator.frequency.setValueAtTime(783.99, now);
+             now += 0.1;
+             oscillator.frequency.setValueAtTime(1046.50, now);
+             gainNode.gain.exponentialRampToValueAtTime(0.00001, now + 0.2);
+             break;
+        case 'gameOver':
+            oscillator.type = 'sawtooth';
+            oscillator.frequency.setValueAtTime(200, audioCtx.currentTime);
+            oscillator.frequency.exponentialRampToValueAtTime(50, audioCtx.currentTime + 1.0);
+            gainNode.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + 1.0);
+            break;
+    }
+    oscillator.start();
+    oscillator.stop(audioCtx.currentTime + 1.5);
+}
+
+
+// --- GAME LOGIC ---
+
+class Ball {
+    constructor(x, y, baseSpeed) {
+        this.x = x;
+        this.y = y;
+        this.baseSpeed = baseSpeed;
+        this.dirX = (Math.random() > 0.5 ? 1 : -1) / Math.sqrt(2);
+        this.dirY = (Math.random() > 0.5 ? 1 : -1) / Math.sqrt(2);
+        this.color = Math.random() > 0.5 ? '#ff4136' : '#0074d9';
+        this.angle = 0; // Add angle for rotation
+    }
+
+    move(activeAreas, currentCapturedArea, gameTotalArea) {
+        const captureRatio = currentCapturedArea / gameTotalArea;
+        const currentSpeed = this.baseSpeed * (1 + captureRatio * 0.8);
+
+        this.x += this.dirX * currentSpeed;
+        this.y += this.dirY * currentSpeed;
+
+        // Add angle update for spinning effect
+        const spinSpeed = 0.1; // Adjust for desired spin speed
+        this.angle += spinSpeed;
+
+        const area = activeAreas.find(a => 
+            this.x >= a.x && this.x <= a.x + a.width &&
+            this.y >= a.y && this.y <= a.y + a.height
+        );
+
+        if (!area) return;
+
+        if (this.x + BALL_RADIUS > area.x + area.width || this.x - BALL_RADIUS < area.x) {
+            this.dirX *= -1;
+            this.x = Math.max(this.x, area.x + BALL_RADIUS);
+            this.x = Math.min(this.x, area.x + area.width - BALL_RADIUS);
+        }
+        if (this.y + BALL_RADIUS > area.y + area.height || this.y - BALL_RADIUS < area.y) {
+            this.dirY *= -1;
+            this.y = Math.max(this.y, area.y + BALL_RADIUS);
+            this.y = Math.min(this.y, area.y + area.height - BALL_RADIUS);
+        }
+    }
+
+    draw(ctx) {
+        // Draw the base color
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, BALL_RADIUS, 0, Math.PI * 2);
+        ctx.fillStyle = this.color;
+        ctx.fill();
+        ctx.closePath();
+
+        // Draw the spinning white semi-circle
+        ctx.beginPath();
+        // Move to the center to ensure the arc is filled as a pie slice
+        ctx.moveTo(this.x, this.y); 
+        ctx.arc(this.x, this.y, BALL_RADIUS, this.angle, this.angle + Math.PI);
+        ctx.closePath(); // Close path to form a semi-circle shape
+        ctx.fillStyle = 'white';
+        ctx.fill();
+    }
+}
+
+function startGame() {
+    level = 1;
+    lives = INITIAL_LIVES;
+    setupLevel();
+}
+
+function setupLevel() {
+    gameState = 'PLAYING';
+    messageOverlay.textContent = '';
+    
+    activeAreas = [{ x: 0, y: 0, width: GAME_WIDTH, height: GAME_HEIGHT }];
+    capturedArea = 0;
+
+    balls = [];
+    const numBalls = level + 1;
+    const baseSpeed = 1.5 + level * 0.15;
+    for (let i = 0; i < numBalls; i++) {
+        const x = Math.random() * (GAME_WIDTH - 4 * BALL_RADIUS) + 2 * BALL_RADIUS;
+        const y = Math.random() * (GAME_HEIGHT - 4 * BALL_RADIUS) + 2 * BALL_RADIUS;
+        balls.push(new Ball(x, y, baseSpeed));
+    }
+
+    buildingWall = null;
+    updateUI();
+}
+
+function handleCanvasClick(event) {
+    // If game is idle or over, the first click starts it.
+    if (gameState === 'IDLE' || gameState === 'GAME_OVER') {
+        startGame();
+    }
+    
+    if (gameState !== 'PLAYING' || buildingWall) return;
+    initAudio();
+
+    const rect = canvas.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+
+    const clickedArea = activeAreas.find(a => x >= a.x && x <= a.x + a.width && y >= a.y && y <= a.y + a.height);
+    if (!clickedArea) return;
+
+    playSound('startWall');
+    const direction = event.button === 0 ? 'vertical' : 'horizontal';
+
+    buildingWall = {
+        direction: direction,
+        originArea: clickedArea,
+        pos: direction === 'vertical' ? x : y,
+        growth1: direction === 'vertical' ? y : x,
+        growth2: direction === 'vertical' ? y : x,
+    };
+    
+    event.preventDefault();
+}
+
+function updateBuildingWall() {
+    if (!buildingWall) return;
+
+    const area = buildingWall.originArea;
+    const limit1 = buildingWall.direction === 'vertical' ? area.y : area.x;
+    const limit2 = buildingWall.direction === 'vertical' ? area.y + area.height : area.x + area.width;
+
+    let growthComplete1 = buildingWall.growth1 <= limit1;
+    let growthComplete2 = buildingWall.growth2 >= limit2;
+
+    if (!growthComplete1) buildingWall.growth1 -= WALL_BUILD_SPEED;
+    if (!growthComplete2) buildingWall.growth2 += WALL_BUILD_SPEED;
+    
+    buildingWall.growth1 = Math.max(limit1, buildingWall.growth1);
+    buildingWall.growth2 = Math.min(limit2, buildingWall.growth2);
+    
+    growthComplete1 = buildingWall.growth1 === limit1;
+    growthComplete2 = buildingWall.growth2 === limit2;
+
+    for (const ball of balls) {
+        let collision = false;
+        if (buildingWall.direction === 'vertical') {
+            if (Math.abs(ball.x - buildingWall.pos) < BALL_RADIUS) {
+                if (ball.y > buildingWall.growth1 && ball.y < buildingWall.growth2) collision = true;
+            }
+        } else {
+            if (Math.abs(ball.y - buildingWall.pos) < BALL_RADIUS) {
+                if (ball.x > buildingWall.growth1 && ball.x < buildingWall.growth2) collision = true;
+            }
+        }
+
+        if (collision) {
+            playSound('failWall');
+            buildingWall = null;
+            lives--;
+            updateUI();
+            if (lives <= 0) handleGameOver();
+            return;
+        }
+    }
+
+    if (growthComplete1 && growthComplete2) completeWall();
+}
+
+function completeWall() {
+    if (!buildingWall) return;
+    playSound('completeWall');
+
+    const oldArea = buildingWall.originArea;
+    const wallPos = buildingWall.pos;
+    const direction = buildingWall.direction;
+
+    activeAreas = activeAreas.filter(a => a !== oldArea);
+
+    let newArea1, newArea2;
+    if (direction === 'vertical') {
+        newArea1 = { x: oldArea.x, y: oldArea.y, width: wallPos - oldArea.x, height: oldArea.height };
+        newArea2 = { x: wallPos, y: oldArea.y, width: (oldArea.x + oldArea.width) - wallPos, height: oldArea.height };
+    } else {
+        newArea1 = { x: oldArea.x, y: oldArea.y, width: oldArea.width, height: wallPos - oldArea.y };
+        newArea2 = { x: oldArea.x, y: wallPos, width: oldArea.width, height: (oldArea.y + oldArea.height) - wallPos };
+    }
+    
+    const ballsInArea1 = balls.some(b => b.x >= newArea1.x && b.x <= newArea1.x + newArea1.width && b.y >= newArea1.y && b.y <= newArea1.y + newArea1.height);
+    const ballsInArea2 = balls.some(b => b.x >= newArea2.x && b.x <= newArea2.x + newArea2.width && b.y >= newArea2.y && b.y <= newArea2.y + newArea2.height);
+
+    if (ballsInArea1) {
+        if(newArea1.width > 0 && newArea1.height > 0) activeAreas.push(newArea1);
+    } else if (newArea1.width > 1 && newArea1.height > 1) {
+        capturedArea += newArea1.width * newArea1.height;
+    }
+
+    if (ballsInArea2) {
+        if(newArea2.width > 0 && newArea2.height > 0) activeAreas.push(newArea2);
+    } else if (newArea2.width > 1 && newArea2.height > 1) {
+        capturedArea += newArea2.width * newArea2.height;
+    }
+
+    buildingWall = null;
+    updateUI();
+    checkLevelComplete();
+}
+
+function checkLevelComplete() {
+    const capturePercent = (capturedArea / totalArea) * 100;
+    if (capturePercent >= CAPTURE_GOAL) {
+        gameState = 'LEVEL_COMPLETE';
+        playSound('levelComplete');
+        messageOverlay.textContent = `Level ${level} Complete!`;
+        level++;
+        setTimeout(() => {
+             if (gameState === 'LEVEL_COMPLETE') setupLevel();
+        }, 2000);
+    }
+}
+
+function handleGameOver() {
+    gameState = 'GAME_OVER';
+    playSound('gameOver');
+    messageOverlay.textContent = 'GAME OVER';
+}
+
+function updateUI() {
+    levelDisplay.textContent = `Level: ${level}`;
+    livesDisplay.textContent = `Lives: ${lives}`;
+    const capturePercent = Math.floor((capturedArea / totalArea) * 100);
+    captureDisplay.textContent = `Captured: ${capturePercent}%`;
+}
+
+function updateSoundIcon() {
+    soundToggle.innerHTML = soundEnabled ? SVG_SOUND_ON : SVG_SOUND_OFF;
+}
+
+// --- MAIN GAME LOOP ---
+
+function gameLoop() {
+    if (gameState === 'PLAYING') {
+        balls.forEach(ball => ball.move(activeAreas, capturedArea, totalArea));
+        updateBuildingWall();
+
+        ctx.fillStyle = '#8b0000';
+        ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+        
+        ctx.fillStyle = '#000';
+        activeAreas.forEach(area => {
+            ctx.fillRect(area.x, area.y, area.width, area.height);
+        });
+
+        balls.forEach(ball => ball.draw(ctx));
+
+        if (buildingWall) {
+            ctx.strokeStyle = '#ffff00';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            if (buildingWall.direction === 'vertical') {
+                ctx.moveTo(buildingWall.pos, buildingWall.growth1);
+                ctx.lineTo(buildingWall.pos, buildingWall.growth2);
+            } else {
+                ctx.moveTo(buildingWall.growth1, buildingWall.pos);
+                ctx.lineTo(buildingWall.growth2, buildingWall.pos);
+            }
+            ctx.stroke();
+        }
+    }
+
+    requestAnimationFrame(gameLoop);
+}
+
+// --- EVENT LISTENERS ---
+soundToggle.addEventListener('click', () => {
+    initAudio();
+    soundEnabled = !soundEnabled;
+    updateSoundIcon();
+});
+
+canvas.addEventListener('mousedown', handleCanvasClick);
+canvas.addEventListener('contextmenu', event => event.preventDefault());
+
+// --- INITIALIZATION ---
+updateUI();
+updateSoundIcon();
+messageOverlay.textContent = 'Click to Start!';
+gameLoop();
+
+</script>
+</body>
+</html>
